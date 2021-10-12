@@ -20,6 +20,8 @@
 
 #include "modal_wnd_base.h"
 
+#include <xutility>
+
 namespace nim_comp {
 
 class AsyncModalRunner : protected nbase::Thread
@@ -37,12 +39,16 @@ public:
 	void CancelModalThenExit();
 
 private:
-	template<class _Ty>
-	friend class std::_Ref_count_obj;
-
 	friend class AsyncModalRunnerManager;
+	friend class std::_Ref_count_obj2<AsyncModalRunner>;
 	friend class std::shared_ptr<AsyncModalRunner>;
 	friend class std::_Ref_count<AsyncModalRunner>;
+
+	template <class _Ty, class... _Types>
+	friend void std::_Construct_in_place(_Ty& _Obj, _Types&&... _Args) noexcept(std::is_nothrow_constructible_v<_Ty, _Types...>);
+
+	template<class _Ty>
+	friend void std::_Destroy_in_place(_Ty& Obj) noexcept;
 
 	AsyncModalRunner(Delegate *delegate);
 	virtual ~AsyncModalRunner();
