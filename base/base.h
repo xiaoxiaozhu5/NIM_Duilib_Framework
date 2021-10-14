@@ -28,6 +28,7 @@
 #include "util/template_util.h"
 #include "util/unicode.h"
 #include "util/valuemap.h"
+#include "util/hashit.h"
 #include "win32/object_watcher.h"
 #include "win32/path_util.h"
 #include "win32/platform_string_util.h"

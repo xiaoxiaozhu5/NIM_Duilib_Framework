@@ -150,9 +150,12 @@ std::string Control::GetUTF8BkImage() const
 	return strOut;
 }
 
-void Control::SetBkImage(const std::wstring& strImage)
+void Control::SetBkImage(const std::wstring& strImage, unsigned char* data, unsigned int len)
 {
 	StopGifPlay();
+	m_bkImage.in_memory = (data != nullptr && len > 0) ? true : false;
+	m_bkImage.data = data;
+	m_bkImage.memory_size = len;
 	m_bkImage.SetImageString(strImage);
 	m_bGifPlay = m_bkImage.imageAttribute.nPlayCount != 0;
 	if (GetFixedWidth() == DUI_LENGTH_AUTO || GetFixedHeight() == DUI_LENGTH_AUTO) {
@@ -1217,7 +1220,11 @@ void Control::GetImage(Image& duiImage) const
 	imageFullPath = StringHelper::ReparsePath(imageFullPath);
 
 	if (!duiImage.imageCache || duiImage.imageCache->sImageFullPath != imageFullPath) {
-		duiImage.imageCache = GlobalManager::GetImage(imageFullPath);
+		if(duiImage.in_memory) {
+			duiImage.imageCache = GlobalManager::GetImage(duiImage.data, duiImage.memory_size);	
+		} else {
+			duiImage.imageCache = GlobalManager::GetImage(imageFullPath);
+		}
 	}
 }
 

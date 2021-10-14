@@ -1,7 +1,11 @@
 #include "StdAfx.h"
+
+#include <iomanip>
+#include <sstream>
 #include <zmouse.h>
 #include <shlwapi.h>
 #include "Utils/UnZip.h"
+#include "base/util/hashit.h"
 
 namespace ui
 {
@@ -269,6 +273,61 @@ std::shared_ptr<ImageInfo> GlobalManager::GetImage(const std::wstring& bitmap)
 		{
 			data = ImageInfo::LoadImage(imageFullPath);
 		}
+		if (!data) return sharedImage;
+		sharedImage.reset(data.release(), &OnImageInfoDestroy);
+		m_mImageHash[imageFullPath] = sharedImage;
+		sharedImage->SetCached(true);
+	}
+	else {
+		sharedImage = it->second.lock();
+	}
+
+	return sharedImage;
+}
+
+std::shared_ptr<ImageInfo> GlobalManager::GetImage(BYTE* idata, UINT size)
+{
+	unsigned char hash[MAX_PATH] = {0};
+	unsigned int hash_len = MAX_PATH;
+	auto rc = nbase::hash(idata, size, hash, &hash_len);
+	if(!rc) {
+		return std::shared_ptr<ImageInfo>();
+	}
+
+	std::ostringstream buffer;
+     for (int i = 0; i < hash_len; ++i) {
+       buffer << std::hex
+              << std::setw(2)
+              << std::setfill('0')
+              << static_cast<int>( hash[i] );
+     }
+
+	std::wstring imageFullPath;
+	StringHelper::MBCSToUnicode(buffer.str(), imageFullPath);
+
+	std::shared_ptr<ImageInfo> sharedImage;
+	auto it = m_mImageHash.find(imageFullPath);
+	if (it == m_mImageHash.end()) {
+		std::unique_ptr<ImageInfo> data;
+
+		auto hGlobal = GlobalAlloc(GMEM_MOVEABLE | GMEM_NODISCARD, size);
+		if (hGlobal)
+		{
+			TCHAR* pData = (TCHAR*)GlobalLock(hGlobal);
+			if (pData)
+			{
+				memcpy(pData, idata, size);
+				GlobalUnlock(hGlobal);
+
+				data = ImageInfo::LoadImage(hGlobal, imageFullPath);
+			}
+			else
+			{
+				GlobalFree(hGlobal);
+				hGlobal = NULL;
+			}
+		}
+
 		if (!data) return sharedImage;
 		sharedImage.reset(data.release(), &OnImageInfoDestroy);
 		m_mImageHash[imageFullPath] = sharedImage;

@@ -87,6 +87,9 @@ public:
 	bool ContinuePlay();
 	ImageAttribute imageAttribute;
 	std::shared_ptr<ImageInfo> imageCache;
+	bool in_memory = false;
+	BYTE* data = nullptr;
+	UINT memory_size = 0;
 
 private:
 	int m_nCurrentFrame;

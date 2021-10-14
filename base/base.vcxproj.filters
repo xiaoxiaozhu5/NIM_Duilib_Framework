@@ -244,6 +244,9 @@
     <ClInclude Include="base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="util\hashit.h">
+      <Filter>util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="file\file_util.cpp">
@@ -371,6 +374,9 @@
     </ClCompile>
     <ClCompile Include="network\network_util.cpp">
       <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="util\hashit.cpp">
+      <Filter>util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
