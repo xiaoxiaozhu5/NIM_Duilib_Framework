@@ -5,7 +5,8 @@ namespace nim_comp {
 
 enum ThreadId
 {
-	kThreadUI
+	kThreadUI,
+	kThreadGlobalMisc,
 };
 
 }
