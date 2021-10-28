@@ -223,8 +223,8 @@ bool ListBox::SetItemIndex(Control* pControl, std::size_t iIndex)
 	std::size_t iMinIndex = min((std::size_t)iOrginIndex, iIndex);
 	std::size_t iMaxIndex = max((std::size_t)iOrginIndex, iIndex);
 	for(std::size_t i = iMinIndex; i < iMaxIndex + 1; ++i) {
-		Control* pControl = GetItemAt(i);
-		ListContainerElement* pListItem = dynamic_cast<ListContainerElement*>(pControl);
+		Control* pTempControl = GetItemAt(i);
+		ListContainerElement* pListItem = dynamic_cast<ListContainerElement*>(pTempControl);
 		if( pListItem != NULL ) {
 			pListItem->SetIndex((int)i);
 		}
@@ -390,7 +390,8 @@ void ListBox::SetScrollSelect(bool bScrollSelect)
 
 ListContainerElement::ListContainerElement() :
 	m_iIndex(-1),
-	m_pOwner(nullptr)
+	m_pOwner(nullptr),
+	m_bSelectWhenInternalMenu(true)
 {
 	m_uTextStyle = DT_LEFT | DT_VCENTER | DT_END_ELLIPSIS | DT_NOCLIP | DT_SINGLELINE;
 	SetReceivePointerMsg(false);
@@ -433,7 +434,8 @@ void ListContainerElement::HandleMessage(EventArgs& event)
 		}
 	}
 	else if (event.Type == kEventInternalMenu && IsEnabled()) {
-		Selected(true, true);
+		if(m_bSelectWhenInternalMenu)
+			Selected(true, true);
 		m_pWindow->SendNotify(this, kEventMouseMenu);
 		Invalidate();
 
@@ -447,7 +449,10 @@ void ListContainerElement::HandleMessage(EventArgs& event)
 	// in its path to the item, but key-presses etc. needs to go to the actual list.
 	//if( m_pOwner != NULL ) m_pOwner->HandleMessage(event); else Control::HandleMessage(event);
 }
-
+void ListContainerElement::SelectWhenInternalMenu(bool sel)
+{
+	m_bSelectWhenInternalMenu = sel;
+}
 IListOwner* ListContainerElement::GetOwner()
 {
     return m_pOwner;
