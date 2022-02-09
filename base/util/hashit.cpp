@@ -9,9 +9,11 @@
 #include <bcrypt.h>
 #include <sal.h>
 
+#pragma comment(lib, "Bcrypt.lib")
+
 namespace nbase {
 
-bool hash(unsigned char* data, unsigned int len, unsigned char* hashed, unsigned int * hashed_len) {
+bool hash(const wchar_t* pszAlgId, unsigned char* data, unsigned int len, unsigned char* hashed, unsigned int * hashed_len) {
 	BCRYPT_ALG_HANDLE hAlg = NULL;
 	BCRYPT_HASH_HANDLE hHash = NULL;
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
@@ -24,7 +26,7 @@ bool hash(unsigned char* data, unsigned int len, unsigned char* hashed, unsigned
 	//open an algorithm handle
 	if (!NT_SUCCESS(status = BCryptOpenAlgorithmProvider(
 		&hAlg,
-		BCRYPT_SHA256_ALGORITHM,
+		pszAlgId,
 		NULL,
 		0))) {
 		goto Cleanup;
@@ -124,5 +126,16 @@ Cleanup:
 	}
 
 	return true;
+}
+
+	
+bool hash_sha256(unsigned char* data, unsigned len, unsigned char* hashed, unsigned* hashed_len)
+{
+	return hash(BCRYPT_SHA256_ALGORITHM, data, len, hashed, hashed_len);
+}
+
+bool hash_md5(unsigned char* data, unsigned len, unsigned char* hashed, unsigned* hashed_len)
+{
+	return hash(BCRYPT_MD5_ALGORITHM, data, len, hashed, hashed_len);
 }
 } // namespace nbase

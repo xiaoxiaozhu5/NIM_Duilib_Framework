@@ -289,7 +289,7 @@ std::shared_ptr<ImageInfo> GlobalManager::GetImage(BYTE* idata, UINT size)
 {
 	unsigned char hash[MAX_PATH] = {0};
 	unsigned int hash_len = MAX_PATH;
-	auto rc = nbase::hash(idata, size, hash, &hash_len);
+	auto rc = nbase::hash_sha256(idata, size, hash, &hash_len);
 	if(!rc) {
 		return std::shared_ptr<ImageInfo>();
 	}

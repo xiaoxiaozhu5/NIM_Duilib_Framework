@@ -52,7 +52,7 @@ void BasicForm::InitWindow()
 
 	unsigned char hash[MAX_PATH] = {0};
 	unsigned int hash_len = MAX_PATH;
-	auto rc = nbase::hash((PBYTE)image_data_.data(), image_data_.size(), hash, &hash_len);
+	auto rc = nbase::hash_sha256((PBYTE)image_data_.data(), image_data_.size(), hash, &hash_len);
 	if(!rc) {
 		label_->SetText(L"hash failed");
 		return;
